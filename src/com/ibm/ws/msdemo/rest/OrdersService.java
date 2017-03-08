@@ -80,9 +80,14 @@ public class OrdersService {
 	public Response create(Order order) {
 		System.out.println("New order: " + order.toString());
 		try {
-			utx.begin();
-			em.persist(order);
-			utx.commit();
+			em.getTransaction().begin();
+			if (!em.contains(order)) {
+		        // persist object - add to entity manager
+		        em.persist(order);
+		        // flush em - save to DB
+		        em.flush();
+		    }
+			em.getTransaction().commit();
 			
 			return Response.status(201).entity(String.valueOf(order.getId())).build();
 		} catch (Exception e) {
